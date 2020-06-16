@@ -205,7 +205,16 @@ module JobIteration
     end
 
     class FailingIterationJob < SimpleIterationJob
-      retry_on RuntimeError, attempts: 3, wait: 0
+      # retry_on RuntimeError, attempts: 3, wait: 0
+      # this rescue adds a simplified version of `retry_on` which gets
+      # added to ActiveJob in version 5.1
+      rescue_from RuntimeError do
+        if self.executions < 3
+          retry_job
+        else
+          raise
+        end
+      end
 
       def build_enumerator(cursor:)
         enumerator_builder.active_record_on_records(

@@ -12,6 +12,7 @@ module JobIteration
         :start_time,
         :times_interrupted,
         :total_time,
+        :executions
       )
 
       define_callbacks :start
@@ -47,6 +48,7 @@ module JobIteration
       super
       self.times_interrupted = 0
       self.total_time = 0.0
+      self.executions = 0
       assert_implements_methods!
     end
     ruby2_keywords(:initialize) if respond_to?(:ruby2_keywords, true)
@@ -56,6 +58,7 @@ module JobIteration
         'cursor_position' => cursor_position,
         'times_interrupted' => times_interrupted,
         'total_time' => total_time,
+        'executions' => executions
       )
     end
 
@@ -64,6 +67,12 @@ module JobIteration
       self.cursor_position = job_data['cursor_position']
       self.times_interrupted = job_data['times_interrupted'] || 0
       self.total_time = job_data['total_time'] || 0
+      self.executions = job_data['executions']
+    end
+
+    def perform_now
+      self.executions = (executions || 0) + 1
+      super
     end
 
     def perform(*params) # @private
