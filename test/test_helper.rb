@@ -16,6 +16,7 @@ require "active_record"
 require "pry"
 require 'mocha/minitest'
 require 'database_cleaner'
+require "byebug"
 
 GlobalID.app = "iteration"
 ActiveRecord::Base.include(GlobalID::Identification) # https://github.com/rails/globalid/blob/master/lib/global_id/railtie.rb
@@ -45,23 +46,25 @@ ActiveJob::Base.queue_adapter = :iteration_test
 class Product < ActiveRecord::Base
 end
 
-host = ENV['USING_DEV'] == "1" ? 'job-iteration.railgun' : 'localhost'
+host = '127.0.0.1'
 
 connection_config = {
   adapter: "mysql2",
   database: "job_iteration_test",
-  username: 'root',
+  username: "root",
+  password: "password",
   host: host,
+  port: 3316
 }
 
 ActiveRecord::Base.establish_connection(connection_config)
 
-Redis.current = Redis.new(host: host, timeout: 1.0).tap(&:ping)
+Redis.current = Redis.new(host: host, port: 6389, timeout: 1.0).tap(&:ping)
 
 Resque.redis = Redis.current
 
 Sidekiq.configure_client do |config|
-  config.redis = { host: host }
+  config.redis = { host: host, port: 6389 }
 end
 
 ActiveRecord::Base.connection.create_table(Product.table_name, force: true) do |t|
