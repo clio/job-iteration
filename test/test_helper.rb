@@ -54,17 +54,17 @@ connection_config = {
   username: "root",
   password: "password",
   host: host,
-  port: 3306
+  port: 3316
 }
 
 ActiveRecord::Base.establish_connection(connection_config)
 
-Redis.current = Redis.new(host: host, timeout: 1.0).tap(&:ping)
+Redis.current = Redis.new(host: host, port: 6389, timeout: 1.0).tap(&:ping)
 
 Resque.redis = Redis.current
 
 Sidekiq.configure_client do |config|
-  config.redis = { host: host }
+  config.redis = { host: host, port: 6389 }
 end
 
 ActiveRecord::Base.connection.create_table(Product.table_name, force: true) do |t|
