@@ -2,13 +2,13 @@ version: '3.7'
 
 services:
   mysql:
-    image: clio-peng-docker-dev-local.jfrog.io/service-mysql-5.7:latest
+    image: 076945025318.dkr.ecr.us-west-2.amazonaws.com/clio/services/mysql:5.7
     environment:
       - 'ROOT_PASSWORD=password'
     ports:
       - '3316:3306'
 
   redis:
-    image: clio-peng-docker-dev-local.jfrog.io/service-redis-4.10.0:latest
+    image: 076945025318.dkr.ecr.us-west-2.amazonaws.com/clio/services/redis:4.0.10
     ports:
       - '6389:6379'
