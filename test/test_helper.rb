@@ -96,7 +96,11 @@ ActiveJob::Base.logger = Logger.new(IO::NULL)
 module ActiveSupport
   class TestCase
     setup do
-      Redis.current.flushdb
+      begin
+        Redis.current.call("FLUSHDB_IS_A_PROTECTED_COMMAND")
+      rescue Redis::CommandError
+        Redis.current.flushdb
+      end
     end
   end
 end
